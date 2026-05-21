@@ -18,8 +18,8 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 # ── Kernel headers (needed to build linuwu-sense) ─────────────────────────────
-echo "==> Installing kernel headers..."
-pacman -S --needed --noconfirm linux-cachyos-headers base-devel
+echo "==> Installing kernel headers and clang..."
+pacman -S --needed --noconfirm linux-cachyos-headers base-devel clang lld
 
 # ── Download latest DAMX release ──────────────────────────────────────────────
 echo "==> Fetching latest DAMX release..."
@@ -41,9 +41,9 @@ curl -L "$DOWNLOAD_URL" | tar -xJ -C "$TMPDIR" --strip-components=1
 # ── Build and install linuwu-sense driver ────────────────────────────────────
 echo "==> Building linuwu-sense kernel driver..."
 cd "$TMPDIR/Linuwu-Sense"
-make clean
-make
-make install
+make clean CC=clang LD=ld.lld
+make CC=clang LD=ld.lld
+make install CC=clang LD=ld.lld
 cd "$TMPDIR"
 
 echo "==> Writing modprobe config (predator_v4=1 — required for PHN16S)..."
